@@ -13,7 +13,7 @@ namespace :db do
   task :build_databases do
     pg_spec = {
       :adapter  => 'postgresql',
-      :host     => 'localhost',
+      :host     => ENV['POSTGRES_HOST'],
       :username => (ENV['POSTGRES_USER'] || 'postgres'),
       :encoding => 'utf8',
       :password=>'password'
