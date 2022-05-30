@@ -5,6 +5,9 @@ on:
 
 jobs:
   rspec:
+    strategy:
+      matrix:
+        rails: [52, 60]
     runs-on: ubuntu-latest
     container: ruby:2.6
     env:
@@ -41,4 +44,4 @@ jobs:
         run: bundle exec appraisal rails52 rake db:prepare
 
       - name: test
-        run: bundle exec appraisal rake
+        run: bundle exec appraisal rails${{ matrix.rails }} rake
