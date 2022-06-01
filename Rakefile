@@ -13,16 +13,19 @@ namespace :db do
   task :build_databases do
     pg_spec = {
       :adapter  => 'postgresql',
-      :host     => 'localhost',
+      :host     => ENV['POSTGRES_HOST'],
       :username => (ENV['POSTGRES_USER'] || 'postgres'),
       :encoding => 'utf8',
+      :password=>'password'
     }
 
     mysql_spec = {
       :adapter  => 'mysql2',
-      :host     => 'localhost',
+      :host     => ENV['MYSQL_HOST'],
       :username => (ENV['MYSQL_USER'] || 'root'),
       :encoding => 'utf8',
+      :password=>'password',
+      :charset=> 'utf8'
     }
 
     ` rm -f /tmp/database.sqlite3 `
@@ -65,7 +68,7 @@ namespace :db do
       class BlankModel < ActiveRecord::Base; end
 
       BlankModel.using(shard_symbol).connection.initialize_schema_migrations_table
-      BlankModel.using(shard_symbol).connection.initialize_metadata_table if Octopus.atleast_rails50? 
+      BlankModel.using(shard_symbol).connection.initialize_metadata_table if Octopus.atleast_rails50?
 
       BlankModel.using(shard_symbol).connection.create_table(:users) do |u|
         u.string :name

@@ -1,0 +1,47 @@
+name: rspec
+on:
+  push:
+  pull_request:
+
+jobs:
+  rspec:
+    strategy:
+      matrix:
+        rails: [52, 60]
+    runs-on: ubuntu-latest
+    container: ruby:2.6
+    env:
+      MYSQL_HOST: mysql
+      POSTGRES_HOST: postgres
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: password
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: setup dependencies
+        run: |
+          apt-get update
+          apt-get -y install libpq-dev libmysqld-dev libsqlite3-dev
+          bundle install
+          bundle exec appraisal install
+
+      - name: DB preparation
+        run: bundle exec appraisal rails52 rake db:prepare
+
+      - name: test
+        run: bundle exec appraisal rails${{ matrix.rails }} rake
